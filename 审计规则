@@ -23,7 +23,6 @@
 (torrent|\.torrent|peer_id=|info_hash|get_peers|find_node|BitTorrent|announce_peer|announce\.php\?passkey=)
 (api|ps|sv|offnavi|newvector|ulog\.imap|newloc)(\.map|)\.(baidu|n\.shifen)\.com
 (.?)(xunlei|sandai|Thunder|XLLiveUD)(.)
-Bit­Tor­rent pro­to­col
 BitTorrent protocol
 torrent
 SMTP
