@@ -53,3 +53,5 @@ DOMAIN,su.viclub.top
 DOMAIN,emby.tnx.one
 #熊猫
 DOMAIN,pdatv.cc
+#infinityfly
+IP-CIDR,140.83.59.29/32,DIRECT
