@@ -1,14 +1,9 @@
 #守候
-DOMAIN,preus.cn2gias.uk
-DOMAIN,emby.cn2gias.uk
+DOMAIN-SUFFIX,cn2gias.uk
 #飞跃
 IP-CIDR,152.53.19.231/24
 #刺激
-DOMAIN,jpp.809688.xyz
-DOMAIN,sm.809688.xyz
-DOMAIN,sr.809688.xyz
-DOMAIN,sg.809688.xyz
-DOMAIN,ss.809688.xyz
+DOMAIN-SUFFIX,809688.xyz
 #阿甘
 DOMAIN,sss.889393.xyz
 #heisi
@@ -22,8 +17,7 @@ DOMAIN,peachmv.me
 #星猫
 DOMAIN,flare.catlinks.co.uk
 #舒服
-DOMAIN,emby3.mcjoker.xyz
-DOMAIN,jz.mcjoker.xyz
+DOMAIN-SUFFIX,mcjoker.xyz
 #垃圾
 DOMAIN,cf.xmsl.org
 #琴鸟
@@ -57,3 +51,7 @@ DOMAIN,pdatv.cc
 IP-CIDR,140.83.59.29/32
 #开心
 IP-CIDR,132.226.229.139/32
+#西瓜
+DOMAIN-SUFFIX,duanh.top
+#阿甘
+DOMAIN,sss.889393.xyz
