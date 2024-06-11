@@ -47,9 +47,5 @@ DOMAIN,emby.tnx.one
 DOMAIN,pdatv.cc
 #infinityfly
 IP-CIDR,140.83.59.29/32
-#开心
-IP-CIDR,132.226.229.139/32
 #西瓜
 DOMAIN-SUFFIX,duanh.top
-#阿甘
-DOMAIN,sss.889393.xyz
