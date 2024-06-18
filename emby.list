@@ -49,5 +49,7 @@ DOMAIN,pdatv.cc
 IP-CIDR,140.83.59.29/32
 #西瓜
 DOMAIN-SUFFIX,duanh.top
-#飞跃音乐服.
+#飞跃音乐服
 DOMAIN,6666666.buzz
+#飞跃地平线
+DOMAIN,123456.buzz
