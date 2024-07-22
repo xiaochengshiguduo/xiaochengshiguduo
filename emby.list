@@ -1,5 +1,3 @@
-#守候
-DOMAIN-SUFFIX,cn2gias.uk
 #飞跃
 IP-CIDR,152.53.19.231/24
 #刺激
@@ -43,8 +41,6 @@ DOMAIN,emby-us-v4.mius.uk
 DOMAIN,su.viclub.top
 #小筑
 DOMAIN,emby.tnx.one
-#熊猫
-DOMAIN,pdatv.cc
 #infinityfly
 IP-CIDR,140.83.59.29/32
 #西瓜
