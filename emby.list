@@ -35,8 +35,6 @@ DOMAIN,cherrytv.one
 DOMAIN,emby.bangumi.ca
 #zz
 DOMAIN,zz-stream.ntrrr.top
-#劳大
-DOMAIN,emby-us-v4.mius.uk
 #大V
 DOMAIN,su.viclub.top
 #小筑
@@ -47,3 +45,5 @@ IP-CIDR,140.83.59.29/32
 DOMAIN-SUFFIX,duanh.top
 #飞跃音乐服
 DOMAIN,6666666.buzz
+#探花
+DOMAIN,tanhuatv.site
