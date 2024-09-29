@@ -16,8 +16,8 @@
 #!
 #! > ↓↓↓↓↓↓↓↓↓（Emby影视的分流）↓↓↓↓↓↓↓↓↓
 payload:
-DOMAIN-SUFFIX,xcxc.lol
-DOMAIN-SUFFIX,xiaochengshiguduo.xyz
+ -DOMAIN-SUFFIX,xcxc.lol
+ -DOMAIN-SUFFIX,xiaochengshiguduo.xyz
 #!Emby-MisakaF
 DOMAIN-SUFFIX,misakaf.org
 DOMAIN-SUFFIX,emby.misakaf.org
