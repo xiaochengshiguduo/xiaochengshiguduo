@@ -15,6 +15,8 @@
 #! 本地分流规则(相同规则下，本地规则将覆盖远程规则，优先生效)↓↓↓↓↓↓↓↓↓
 #!
 #! > ↓↓↓↓↓↓↓↓↓（Emby影视的分流）↓↓↓↓↓↓↓↓↓
+DOMAIN-SUFFIX,xcxc.lol
+DOMAIN-SUFFIX,xiaochengshiguduo.xyz
 #!Emby-MisakaF
 DOMAIN-SUFFIX,misakaf.org
 DOMAIN-SUFFIX,emby.misakaf.org
