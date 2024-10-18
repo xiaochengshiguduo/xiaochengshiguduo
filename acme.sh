@@ -6,15 +6,15 @@ YELLOW="\033[33m"
 PLAIN='\033[0m'
 
 red(){
-    echo -e "\033[31m\033[01m\$1\033[0m"
+    echo -e "\033[31m\033[01m$1\033[0m"
 }
 
 green(){
-    echo -e "\033[32m\033[01m\$1\033[0m"
+    echo -e "\033[32m\033[01m$1\033[0m"
 }
 
 yellow(){
-    echo -e "\033[33m\033[01m\$1\033[0m"
+    echo -e "\033[33m\033[01m$1\033[0m"
 }
 
 REGEX=("debian" "ubuntu" "centos|red hat|kernel|oracle linux|alma|rocky" "'amazon linux'" "fedora")
@@ -117,7 +117,7 @@ check_80(){
         lsof -i:"80"
         read -rp "如需结束占用进程请按Y，按其他键则退出 [Y/N]: " yn
         if [[ $yn =~ "Y"|"y" ]]; then
-            lsof -i:"80" | awk '{print \$2}' | grep -v "PID" | xargs kill -9
+            lsof -i:"80" | awk '{print $2}' | grep -v "PID" | xargs kill -9
             sleep 1
         else
             exit 1
@@ -126,8 +126,8 @@ check_80(){
 }
 
 checktls() {
-    if [[ -f /root/cert.crt && -f /root/private.key ]]; then
-        if [[ -s /root/cert.crt && -s /root/private.key ]]; then
+    if [[ -f /root/sofabe/sofabe/cert.crt && -f /root/sofabe/sofabe/private.key ]]; then
+        if [[ -s /root/sofabe/sofabe/cert.crt && -s /root/sofabe/sofabe/private.key ]]; then
             if [[ -n $(type -P wg-quick) && -n $(type -P wgcf) ]]; then
                 wg-quick up wgcf >/dev/null 2>&1
             fi
@@ -135,17 +135,13 @@ checktls() {
                 systemctl start warp-go 
             fi
 
-            echo $domain > /root/ca.log
+            echo $domain > /root/sofabe/sofabe/ca.log
             sed -i '/--cron/d' /etc/crontab >/dev/null 2>&1
-            echo "0 0 * * * root bash /root/.acme.sh/acme.sh --cron -f >/dev/null 2>&1" >> /etc/crontab
+            echo "0 0 * * * root bash /root/sofabe/sofabe/.acme.sh/acme.sh --cron -f >/dev/null 2>&1" >> /etc/crontab
 
-            green "证书申请成功! 脚本申请到的证书 (cert.crt) 和私钥 (private.key) 文件已保存到 /root 文件夹下"
-            yellow "证书 crt 文件路径如下: /root/cert.crt"
-            yellow "私钥 key 文件路径如下: /root/private.key"
-            # 将证书和私钥复制到当前工作目录
-            cp /root/cert.crt ./cert.crt
-            cp /root/private.key ./private.key
-            green "证书和私钥已复制到当前目录."
+            green "证书申请成功! 脚本申请到的证书 (cert.crt) 和私钥 (private.key) 文件已保存到 /root/sofabe/sofabe 文件夹下"
+            yellow "证书 crt 文件路径如下: /root/sofabe/sofabe/cert.crt"
+            yellow "私钥 key 文件路径如下: /root/sofabe/sofabe/private.key"
         else
             if [[ -n $(type -P wg-quick) && -n $(type -P wgcf) ]]; then
                 wg-quick up wgcf >/dev/null 2>&1
@@ -246,7 +242,7 @@ acme_standalone(){
         fi
     fi
     
-    bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /root/private.key --fullchain-file /root/cert.crt --ecc
+    bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /root/sofabe/sofabe/private.key --fullchain-file /root/sofabe/sofabe/cert.crt --ecc
     checktls
 }
 
@@ -274,7 +270,7 @@ acme_cfapiTLD(){
         bash ~/.acme.sh/acme.sh --issue --dns dns_cf -d "${domain}" -k ec-256 --insecure
     fi
 
-    bash ~/.acme.sh/acme.sh --install-cert -d "${domain}" --key-file /root/private.key --fullchain-file /root/cert.crt --ecc
+    bash ~/.acme.sh/acme.sh --install-cert -d "${domain}" --key-file /root/sofabe/sofabe/private.key --fullchain-file /root/sofabe/sofabe/cert.crt --ecc
     checktls
 }
 
@@ -303,7 +299,7 @@ acme_cfapiNTLD(){
         bash ~/.acme.sh/acme.sh --issue --dns dns_cf -d "*.${domain}" -d "${domain}" -k ec-256 --insecure
     fi
 
-    bash ~/.acme.sh/acme.sh --install-cert -d "*.${domain}" --key-file /root/private.key --fullchain-file /root/cert.crt --ecc
+    bash ~/.acme.sh/acme.sh --install-cert -d "*.${domain}" --key-file /root/sofabe/sofabe/private.key --fullchain-file /root/sofabe/sofabe/cert.crt --ecc
     checktls
 }
 
@@ -324,7 +320,7 @@ revoke_cert() {
         bash ~/.acme.sh/acme.sh --remove -d ${domain} --ecc
 
         rm -rf ~/.acme.sh/${domain}_ecc
-        rm -f /root/cert.crt /root/private.key
+        rm -f /root/sofabe/sofabe/cert.crt /root/sofabe/sofabe/private.key
 
         green "撤销 ${domain} 的域名证书成功"
     else
