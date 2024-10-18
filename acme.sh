@@ -96,6 +96,9 @@ unst_acme() {
 }
 
 check_80(){
+    # 感谢Wulabing前辈提供的检查80端口思路
+    # Source: https://github.com/wulabing/Xray_onekey
+    
     if [[ -z $(type -P lsof) ]]; then
         if [[ ! $SYSTEM == "CentOS" ]]; then
             ${PACKAGE_UPDATE[int]}
