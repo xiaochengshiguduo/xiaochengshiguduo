@@ -1,64 +1,51 @@
 #!/bin/bash
 
-# 检查是否以root用户运行
+# 检查是否为root用户
 if [ "$(id -u)" -ne 0 ]; then
   echo "请使用root用户运行此脚本！"
   exit 1
 fi
 
-# 安装必要依赖
-apt-get update
-apt-get install -y curl unzip jq
+# 安装必要的依赖
+apt-get update >/dev/null 2>&1
+apt-get install -y curl jq uuid-runtime >/dev/null 2>&1
 
-# 下载并安装sing-box
-LATEST_VERSION=$(curl -s "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-ARCH=$(uname -m)
-case $ARCH in
-  "x86_64") ARCH="amd64" ;;
-  "aarch64") ARCH="arm64" ;;
-  *) echo "不支持的架构: $ARCH"; exit 1 ;;
-esac
+# 用户输入参数
+read -p "请输入用户名 (默认: user): " username
+username=${username:-user}
 
-wget "https://github.com/SagerNet/sing-box/releases/download/$LATEST_VERSION/sing-box-$LATEST_VERSION-linux-$ARCH.tar.gz" -O sing-box.tar.gz
-tar -xzf sing-box.tar.gz
-cp "sing-box-$LATEST_VERSION-linux-$ARCH/sing-box" /usr/local/bin/
-rm -rf sing-box.tar.gz "sing-box-$LATEST_VERSION-linux-$ARCH"
+read -p "请输入监听端口 (默认: 443): " listen_port
+listen_port=${listen_port:-443}
 
-# 创建配置目录
-mkdir -p /etc/sing-box
+read -p "请输入Reality域名 (默认: yahoo.com): " server_name
+server_name=${server_name:-yahoo.com}
 
-# 用户输入配置
-read -p "请输入用户名 (默认: user): " USERNAME
-USERNAME=${USERNAME:-user}
-
-read -p "请输入监听端口 (默认: 443): " LISTEN_PORT
-LISTEN_PORT=${LISTEN_PORT:-443}
-
-read -p "请输入REALITY域名 (默认: yahoo.com): " REALITY_DOMAIN
-REALITY_DOMAIN=${REALITY_DOMAIN:-yahoo.com}
-
-read -p "请输入REALITY端口 (默认: 443): " REALITY_PORT
-REALITY_PORT=${REALITY_PORT:-443}
+read -p "请输入Reality握手端口 (默认: 443): " handshake_port
+handshake_port=${handshake_port:-443}
 
 # 生成随机密码
-PASSWORD=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
+password=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 16 | head -n 1)
 
-# 生成REALITY密钥对
-PRIVATE_KEY=$(/usr/local/bin/sing-box generate reality-keypair | grep PrivateKey | awk '{print $2}')
-SHORT_ID=$(openssl rand -hex 8)
+# 生成Reality参数
+private_key=$(./sing-box generate reality-keypair | grep PrivateKey | cut -d'"' -f4)
+short_id=$(head -c 8 /proc/sys/kernel/random/uuid | sed 's/-//g')
+
+# 安装sing-box
+echo "正在安装sing-box..."
+curl -fsSL https://sing-box.app/install.sh | sh -s -- --version 1.12.0-beta.30
 
 # 创建配置文件
-cat > /etc/sing-box/config.json <<EOF
+cat > /usr/local/etc/sing-box/config.json <<EOF
 {
     "inbounds": [
         {
             "type": "anytls",
             "listen": "::",
-            "listen_port": $LISTEN_PORT,
+            "listen_port": ${listen_port},
             "users": [
                 {
-                    "name": "$USERNAME",
-                    "password": "$PASSWORD"
+                    "name": "${username}",
+                    "password": "${password}"
                 }
             ],
             "padding_scheme": [
@@ -74,15 +61,15 @@ cat > /etc/sing-box/config.json <<EOF
             ],
             "tls": {
                 "enabled": true,
-                "server_name": "$REALITY_DOMAIN",
+                "server_name": "${server_name}",
                 "reality": {
                     "enabled": true,
                     "handshake": {
-                        "server": "$REALITY_DOMAIN",
-                        "server_port": $REALITY_PORT
+                        "server": "${server_name}",
+                        "server_port": ${handshake_port}
                     },
-                    "private_key": "$PRIVATE_KEY",
-                    "short_id": "$SHORT_ID"
+                    "private_key": "${private_key}",
+                    "short_id": "${short_id}"
                 }
             }
         }
@@ -90,51 +77,22 @@ cat > /etc/sing-box/config.json <<EOF
 }
 EOF
 
-# 创建systemd服务
-cat > /etc/systemd/system/sing-box.service <<EOF
-[Unit]
-Description=sing-box service
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/sing-box run -c /etc/sing-box/config.json
-Restart=always
-User=root
-Group=root
-LimitNOFILE=65535
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 # 启动服务
-systemctl daemon-reload
-systemctl enable sing-box
-systemctl start sing-box
+systemctl enable --now sing-box
 
 # 获取服务器IP
-SERVER_IP=$(curl -s https://api.ipify.org)
+server_ip=$(curl -4s ip.sb)
 
 # 输出节点信息
-echo "=============================================="
-echo "anytls+reality 节点配置信息:"
-echo "服务器IP: $SERVER_IP"
-echo "监听端口: $LISTEN_PORT"
-echo "用户名: $USERNAME"
-echo "密码: $PASSWORD"
-echo "REALITY域名: $REALITY_DOMAIN"
-echo "REALITY端口: $REALITY_PORT"
-echo "Private Key: $PRIVATE_KEY"
-echo "Short ID: $SHORT_ID"
-echo "=============================================="
-echo ""
-echo "Sub-Store 本地节点信息:"
-echo "anytls://$USERNAME:$PASSWORD@$SERVER_IP:$LISTEN_PORT?server_name=$REALITY_DOMAIN&reality=true&private_key=$PRIVATE_KEY&short_id=$SHORT_ID"
-echo ""
-echo "=============================================="
-echo "sing-box 已安装并启动，可以使用以下命令管理:"
-echo "启动: systemctl start sing-box"
-echo "停止: systemctl stop sing-box"
-echo "重启: systemctl restart sing-box"
-echo "查看状态: systemctl status sing-box"
-echo "=============================================="
+echo "=============================="
+echo "AnyReality 节点配置信息:"
+echo "地址: ${server_ip}"
+echo "端口: ${listen_port}"
+echo "用户: ${username}"
+echo "密码: ${password}"
+echo "SNI: ${server_name}"
+echo "Short ID: ${short_id}"
+echo "=============================="
+echo "Sub-Store 本地节点URI:"
+echo "anytls://${username}:${password}@${server_ip}:${listen_port}?sni=${server_name}&short_id=${short_id}#AnyReality"
+echo "=============================="
